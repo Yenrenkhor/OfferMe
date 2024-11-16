@@ -24,17 +24,19 @@ class ContractWrapper {
   async createTransaction(seller, approver, buyerAddress) {
     const tx = await this.vaultContract.methods.createTransaction(seller, approver).send({
       from: buyerAddress,
-      gas: 100000,
+      gas: 1000000,
     });
     console.log('Transaction Created:', tx.events.RolesAssigned.returnValues.transactionId);
     return tx.events.RolesAssigned.returnValues.transactionId;
   }
 
   async depositETH(transactionId, amount, buyerAddress) {
+    var etherValue = this.web3.utils.toWei(amount, 'ether')
+    console.log(etherValue);
     const tx = await this.vaultContract.methods.depositETH(transactionId).send({
       from: buyerAddress,
-      value: this.web3.utils.toWei(amount.toString(), 'ether'),
-      gas: 200000,
+      value: etherValue,
+      gas: 1000000,
     });
     console.log('ETH Deposited:', tx);
     return tx;
