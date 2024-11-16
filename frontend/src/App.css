@@ -249,4 +249,31 @@ footer {
   .offer-form button {
     font-size: 14px;
   }
+
+  .navbar {
+    display: flex;
+    justify-content: center;
+    background-color: #333;
+    padding: 10px 0;
+  }
+  
+  .navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+  }
+  
+  .navbar li {
+    text-transform: uppercase;
+  }
+  
+  .navbar a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .active-link {
+    border-bottom: 2px solid #fff;
+  }
+  
 }
