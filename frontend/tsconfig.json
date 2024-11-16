@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "allowJs": true,           // Allows JavaScript files in the project
+      "checkJs": false,          // If set to true, TypeScript will type-check JS files
+      "jsx": "react-jsx",        // Enable React JSX support
+      "target": "ES6",
+      "module": "ESNext",
+      "strict": true,
+      "moduleResolution": "node",
+      "esModuleInterop": true
+    },
+    "include": ["src/**/*"],     // Include all files in the `src` directory
+    "exclude": ["node_modules"]  // Exclude dependencies
+  }
+  
