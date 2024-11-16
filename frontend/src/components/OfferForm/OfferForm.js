@@ -51,7 +51,9 @@ function OfferForm({ nftDetails, buyerAddress, sellerAddress }) {
 
         if (currency === 'ETH') {
           console.log(`Processing ETH deposit of ${amount}`);
-          await contractWrapper.depositETH(vaultTransactionId, parseInt(amount), buyerAddress);
+          // Add ETH deposit logic here
+          await contractWrapper.depositETH(vaultTransactionId, amount, buyerAddress)
+
         } else {
           console.log(`Processing ${currency} deposit of ${amount} at token address ${tokenAddress}`);
           try {

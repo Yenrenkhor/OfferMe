@@ -31,10 +31,12 @@ class ContractWrapper {
   }
 
   async depositETH(transactionId, amount, buyerAddress) {
+    var etherValue = this.web3.utils.toWei(amount, 'ether')
+    console.log(etherValue);
     const tx = await this.vaultContract.methods.depositETH(transactionId).send({
       from: buyerAddress,
-      value: this.web3.utils.toWei(amount.toString(), 'ether'),
-      gas: 200000,
+      value: etherValue,
+      gas: 1000000,
     });
     console.log('ETH Deposited:', tx);
     return tx;
