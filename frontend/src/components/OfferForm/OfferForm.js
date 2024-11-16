@@ -1,126 +1,74 @@
-import React, { useState } from 'react';
-import ContractWrapper from '../../wrapper/ContractWrapper';
+import React, { useState } from "react";
 
-function OfferForm({ nftDetails, buyerAddress, sellerAddress }) {
-  const [offerCurrencies, setOfferCurrencies] = useState([{ amount: '', currency: '' }]);
+const OfferForm = ({ nftDetails, buyerAddress, sellerAddress }) => {
+  const [offerAmount, setOfferAmount] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState("ETH");
+  const [isPublic, setIsPublic] = useState(false);
 
-  // Hardcoded token address map
-  const tokenAddressMap = {
-    BTC: '0x1234567890abcdef1234567890abcdef12345678', // Replace with actual token address
-    PEPE: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd', // Replace with actual token address
-    DOGE: '0x9876543210abcdef9876543210abcdef98765432', // Replace with actual token address
-    ETH: null, // No token address required for ETH
-  };
-
-  const contractWrapper = new ContractWrapper();
-
-  const handleCurrencyChange = (index, field, value) => {
-    const updatedCurrencies = [...offerCurrencies];
-    updatedCurrencies[index][field] = value;
-    setOfferCurrencies(updatedCurrencies);
-  };
-
-  const handleAddCurrency = () => {
-    setOfferCurrencies([...offerCurrencies, { amount: '', currency: '' }]);
-  };
-
-  const handleCreateOffer = async () => {
-    console.log('Creating offer with the following details:', {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Future logic for submitting the offer
+    console.log("Offer submitted with details:", {
       nftDetails,
-      offerCurrencies,
+      buyerAddress,
+      sellerAddress,
+      offerAmount,
+      selectedCurrency,
+      isPublic,
     });
-
-    try {
-      let vaultTransactionId = await contractWrapper.createTransaction(sellerAddress, sellerAddress, buyerAddress);
-      console.log(vaultTransactionId)
-      for (const offer of offerCurrencies) {
-        const { amount, currency } = offer;
-  
-        if (!amount || !currency) {
-          alert('Each currency must have an amount and a valid currency selected.');
-          return;
-        }
-  
-        const tokenAddress = tokenAddressMap[currency];
-        if (!tokenAddress && currency !== 'ETH') {
-          alert(`Token address for ${currency} is not defined.`);
-          return;
-        }
-  
-  
-        if (currency === 'ETH') {
-          console.log(`Processing ETH deposit of ${amount}`);
-          // Add ETH deposit logic here
-          await contractWrapper.depositETH(vaultTransactionId, parseInt(amount), buyerAddress)
-        } else {
-          console.log(`Processing ${currency} deposit of ${amount} at token address ${tokenAddress}`);
-          try {
-            await contractWrapper.depositERC20(vaultTransactionId, tokenAddress, parseInt(amount), buyerAddress);
-          } catch (error) {
-            console.error(`Error processing ${currency} deposit:`, error);
-          }
-        }
-      }
-    }
-    catch (ex) {
-      console.log(ex)
-      alert('Error', ex)
-    }
-    
-
-    
-    
-
-    alert('Offer created successfully!');
   };
 
-
+  const handlePublicCheckboxChange = () => {
+    setIsPublic(!isPublic);
+    // Future implementation with Nillion
+    console.log("Public option changed to:", !isPublic);
+  };
 
   return (
-    <form className="offer-form">
-      <h2>Create Offer</h2>
-      <p>Contract Address: {nftDetails.contractAddress}</p>
-      <p>Token ID: {nftDetails.tokenId}</p>
+    <form onSubmit={handleSubmit} className="offer-form">
+      <h3>Create Offer for Selected NFT</h3>
+      <p>NFT Details:</p>
+      <p>
+        Contract Address: {nftDetails.contractAddress}
+        <br />
+        Token ID: {nftDetails.tokenId}
+      </p>
 
-      <div className="currency-fields">
-        {offerCurrencies.map((currency, index) => (
-          <div className="currency-row" key={index}>
-            <input
-              type="number"
-              value={currency.amount}
-              onChange={(e) => handleCurrencyChange(index, 'amount', e.target.value)}
-              placeholder="Amount"
-              required
-              className="currency-input"
-            />
-            <select
-              value={currency.currency}
-              onChange={(e) => handleCurrencyChange(index, 'currency', e.target.value)}
-              required
-              className="currency-select"
-            >
-              <option value="" disabled>
-                Select Currency
-              </option>
-              <option value="BTC">BTC</option>
-              <option value="PEPE">PEPE</option>
-              <option value="DOGE">DOGE</option>
-              <option value="ETH">ETH</option>
-              {/* Add more currencies as needed */}
-            </select>
-          </div>
-        ))}
-      </div>
+      <label>
+        Offer Amount:
+        <input
+          type="number"
+          value={offerAmount}
+          onChange={(e) => setOfferAmount(e.target.value)}
+          placeholder="Enter offer amount"
+          required
+        />
+      </label>
 
-      <button type="button" onClick={handleAddCurrency} className="add-currency-button">
-        Add Currency
-      </button>
+      <label>
+        Currency:
+        <select
+          value={selectedCurrency}
+          onChange={(e) => setSelectedCurrency(e.target.value)}
+        >
+          <option value="ETH">ETH</option>
+          <option value="USDC">USDC</option>
+          <option value="DAI">DAI</option>
+        </select>
+      </label>
 
-      <button type="button" onClick={handleCreateOffer} className="create-offer-button">
-        Create Offer
-      </button>
+      <label>
+        <input
+          type="checkbox"
+          checked={isPublic}
+          onChange={handlePublicCheckboxChange}
+        />
+        Open to Public
+      </label>
+
+      <button type="submit">Create Offer</button>
     </form>
   );
-}
+};
 
 export default OfferForm;
