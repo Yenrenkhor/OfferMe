@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import ContractWrapper from '../../wrapper/ContractWrapper';
+import {
+  connectMetaMask,
+  formMessage,
+  initializeSignProtocolClient,
+  createSchema,
+  createAttestation,
+  queryAttestations
+} from "../../wrapper/SignProtocol";
 
 function OfferForm({ nftDetails, buyerAddress, sellerAddress }) {
+  const [key] = useState(() => Math.floor(Math.random() * 10000));
+  const [timestamp] = useState(() => Date.now());
   const [offerCurrencies, setOfferCurrencies] = useState([{ amount: '', currency: '' }]);
   const [isPublic, setIsPublic] = useState(false); // State for "Open to Public"
 
@@ -32,6 +42,9 @@ function OfferForm({ nftDetails, buyerAddress, sellerAddress }) {
       isPublic, // Include public visibility status
     });
 
+    buyerAddress = buyerAddress.trim();
+    sellerAddress = sellerAddress.trim();
+    console.log(buyerAddress, sellerAddress)
     try {
       let vaultTransactionId = await contractWrapper.createTransaction(sellerAddress, sellerAddress, buyerAddress);
       console.log(vaultTransactionId);
@@ -63,6 +76,20 @@ function OfferForm({ nftDetails, buyerAddress, sellerAddress }) {
           }
         }
       }
+      try {
+        var message = formMessage(buyerAddress, sellerAddress, key, timestamp);
+        const client = initializeSignProtocolClient(message, buyerAddress);
+        const schemaId = await createSchema(client);
+        const signedMessage = await client.account.signMessage(message);
+        console.log(signedMessage)
+        // await createAttestation(client, schemaId, buyerAddress, sellerAddress, tokens, signedMessage);
+        // queryAttestations(signedMessage)
+      } catch (error) {
+        console.error("Error creating attestation:", error);
+        alert("Failed to create attestation. Check the console for details.");
+      }
+      
+
     } catch (ex) {
       console.error('Error:', ex);
       alert('Error:', ex);

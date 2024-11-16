@@ -24,7 +24,7 @@ class ContractWrapper {
   async createTransaction(seller, approver, buyerAddress) {
     const tx = await this.vaultContract.methods.createTransaction(seller, approver).send({
       from: buyerAddress,
-      gas: 1000000,
+      gas: 5000000,
     });
     console.log('Transaction Created:', tx.events.RolesAssigned.returnValues.transactionId);
     return tx.events.RolesAssigned.returnValues.transactionId;
