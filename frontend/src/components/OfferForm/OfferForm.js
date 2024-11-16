@@ -3,6 +3,7 @@ import ContractWrapper from '../../wrapper/ContractWrapper';
 
 function OfferForm({ nftDetails, buyerAddress, sellerAddress }) {
   const [offerCurrencies, setOfferCurrencies] = useState([{ amount: '', currency: '' }]);
+  const [isPublic, setIsPublic] = useState(false); // State for "Open to Public"
 
   // Hardcoded token address map
   const tokenAddressMap = {
@@ -28,30 +29,29 @@ function OfferForm({ nftDetails, buyerAddress, sellerAddress }) {
     console.log('Creating offer with the following details:', {
       nftDetails,
       offerCurrencies,
+      isPublic, // Include public visibility status
     });
 
     try {
       let vaultTransactionId = await contractWrapper.createTransaction(sellerAddress, sellerAddress, buyerAddress);
-      console.log(vaultTransactionId)
+      console.log(vaultTransactionId);
       for (const offer of offerCurrencies) {
         const { amount, currency } = offer;
-  
+
         if (!amount || !currency) {
           alert('Each currency must have an amount and a valid currency selected.');
           return;
         }
-  
+
         const tokenAddress = tokenAddressMap[currency];
         if (!tokenAddress && currency !== 'ETH') {
           alert(`Token address for ${currency} is not defined.`);
           return;
         }
-  
-  
+
         if (currency === 'ETH') {
           console.log(`Processing ETH deposit of ${amount}`);
-          // Add ETH deposit logic here
-          await contractWrapper.depositETH(vaultTransactionId, parseInt(amount), buyerAddress)
+          await contractWrapper.depositETH(vaultTransactionId, parseInt(amount), buyerAddress);
         } else {
           console.log(`Processing ${currency} deposit of ${amount} at token address ${tokenAddress}`);
           try {
@@ -61,20 +61,19 @@ function OfferForm({ nftDetails, buyerAddress, sellerAddress }) {
           }
         }
       }
+    } catch (ex) {
+      console.error('Error:', ex);
+      alert('Error:', ex);
     }
-    catch (ex) {
-      console.log(ex)
-      alert('Error', ex)
-    }
-    
-
-    
-    
 
     alert('Offer created successfully!');
   };
 
-
+  const handlePublicCheckboxChange = () => {
+    setIsPublic(!isPublic);
+    console.log("Public option changed to:", !isPublic);
+    // Future implementation for Nillion integration
+  };
 
   return (
     <form className="offer-form">
@@ -106,7 +105,6 @@ function OfferForm({ nftDetails, buyerAddress, sellerAddress }) {
               <option value="PEPE">PEPE</option>
               <option value="DOGE">DOGE</option>
               <option value="ETH">ETH</option>
-              {/* Add more currencies as needed */}
             </select>
           </div>
         ))}
@@ -115,6 +113,15 @@ function OfferForm({ nftDetails, buyerAddress, sellerAddress }) {
       <button type="button" onClick={handleAddCurrency} className="add-currency-button">
         Add Currency
       </button>
+
+      <label className="public-checkbox">
+        <input
+          type="checkbox"
+          checked={isPublic}
+          onChange={handlePublicCheckboxChange}
+        />
+        Open to Public
+      </label>
 
       <button type="button" onClick={handleCreateOffer} className="create-offer-button">
         Create Offer
